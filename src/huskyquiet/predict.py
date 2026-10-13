@@ -52,6 +52,7 @@ from huskyquiet.config import (
 )
 from huskyquiet.features.engineering import FEATURE_COLUMNS, PERMIT_ATTRIBUTE_COLUMNS, build_feature_frame
 from huskyquiet.features.snapshots import eligible_history, risk_set
+from huskyquiet.features.text import KEYWORD_FEATURES
 from huskyquiet.models.pipelines import model_matrix
 from huskyquiet.models.registry import load_bundle
 
@@ -62,6 +63,24 @@ DISCLAIMER = (
 )
 # Context features need permit history up to as_of; beyond this gap the request is refused.
 MAX_STALENESS_DAYS = 14
+# Columns worth showing next to a live score. They are already computed inside
+# ``score_active_permits``; returning them does not change the probability.
+EXPLAIN_COLUMNS: tuple[str, ...] = (
+    "dist_uw_km",
+    "log_est_cost",
+    "est_cost_missing",
+    "has_related_mup",
+    "zip",
+    "ctx_backlog_all",
+    "ctx_backlog_grp",
+    "ctx_issue_rate_lag_age",
+    "ctx_applied_90d_grp",
+    "ctx_issued_90d_grp",
+    "addr_prior_apps",
+    "addr_prior_issued_365d",
+    "desc_missing",
+    *KEYWORD_FEATURES,
+)
 _PERMIT_NUM = re.compile(r"^[0-9A-Z]+-[A-Z]{2,3}$")
 
 
@@ -274,9 +293,13 @@ class IssuancePredictor:
     ) -> PredictionResult:
         return self.predict_many([permit], as_of, return_features)[0]
 
-    def score_active_permits(self, as_of: date | None = None) -> pd.DataFrame:
+    def score_active_permits(self, as_of: date | None = None, return_features: bool = False) -> pd.DataFrame:
         """Score every application in the modeled risk set at ``as_of`` (default: the day
-        after the latest data). Intended for map/dashboard use."""
+        after the latest data). Intended for map/dashboard use.
+
+        With ``return_features=True``, explanatory columns from the same feature frame that
+        produced the probabilities are attached. The probabilities themselves do not change.
+        """
         t = pd.Timestamp(as_of) if as_of else self.data_as_of + pd.Timedelta(days=1)
         gap = int((t - self.data_as_of).days)
         if gap > MAX_STALENESS_DAYS:
@@ -289,4 +312,10 @@ class IssuancePredictor:
         out = snaps[["permit_num", "age_days"]].merge(self.history[cols], on="permit_num", how="left")
         out["forecast_date"] = t
         out["probability_issued_90d"] = probs
+        if return_features:
+            if len(feats) != len(out):
+                raise RuntimeError("feature row count does not match the active risk set")
+            for col in EXPLAIN_COLUMNS:
+                if col not in out.columns and col in feats.columns:
+                    out[col] = feats[col].to_numpy()
         return out.sort_values("probability_issued_90d", ascending=False, ignore_index=True)

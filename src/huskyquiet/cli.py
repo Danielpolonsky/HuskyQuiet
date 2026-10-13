@@ -42,6 +42,23 @@ def _train(args: argparse.Namespace) -> None:
     run_training(run_backtest=not args.skip_backtest)
 
 
+def _bundle(args: argparse.Namespace) -> None:
+    from pathlib import Path
+
+    from huskyquiet.bundle import write_runtime_bundle
+
+    dest = Path(args.dest) if args.dest else None
+    path = write_runtime_bundle(dest=dest)
+    log.info("Runtime bundle written to %s", path)
+
+
+def _drift(_: argparse.Namespace) -> None:
+    from huskyquiet.diagnostics import write_test_month_calibration
+
+    path = write_test_month_calibration()
+    log.info("Monthly calibration written to %s", path)
+
+
 def _all(args: argparse.Namespace) -> None:
     if not args.skip_download or not get_paths().raw_permits.exists():
         _download(args)
@@ -74,6 +91,15 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--skip-download", action="store_true", help="Reuse existing raw data")
     p.add_argument("--skip-backtest", action="store_true")
     p.set_defaults(func=_all)
+
+    p = sub.add_parser("bundle", help="Zip the runtime files needed to deploy the app")
+    p.add_argument("--dest", default=None, help="Output zip path")
+    p.set_defaults(func=_bundle)
+
+    sub.add_parser(
+        "report-drift",
+        help="Score the saved evaluation model by test month (does not retrain)",
+    ).set_defaults(func=_drift)
     return parser
 
 

@@ -30,6 +30,11 @@ artifacts/**/*.joblib
 reports/*.txt
 *.log
 
+# App caches and deployment bundles (model binaries stay out of git)
+data/cache/
+dist/
+.streamlit/secrets.toml
+
 # OS / editors
 .DS_Store
 Thumbs.db

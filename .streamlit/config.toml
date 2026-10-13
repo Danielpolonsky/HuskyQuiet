@@ -1,0 +1,22 @@
+[server]
+headless = true
+
+[theme]
+base = "light"
+primaryColor = "#0E4D5C"
+backgroundColor = "#F7F5F0"
+secondaryBackgroundColor = "#EFECE4"
+textColor = "#1C2421"
+linkColor = "#0E4D5C"
+borderColor = "#DDD8CC"
+font = "Inter:https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+headingFont = "Inter:https://fonts.googleapis.com/css2?family=Inter:wght@600;700&display=swap"
+baseFontSize = 15
+chartCategoricalColors = ["#0E4D5C", "#A6843D", "#3D6B58", "#8C4A3A", "#5C6B73", "#1F6F8B"]
+chartSequentialColors = ["#F4F7F7", "#D5E4E6", "#A9C9CD", "#7AADB4", "#4E8E97", "#2F727C", "#1C5964", "#124450", "#0B303A", "#061E26"]
+
+[theme.sidebar]
+backgroundColor = "#F3F0E8"
+
+[client]
+toolbarMode = "minimal"

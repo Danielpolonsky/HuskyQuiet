@@ -86,6 +86,15 @@ def test_score_active_permits(predictor):
     assert df["probability_issued_90d"].is_monotonic_decreasing
 
 
+def test_score_active_features_match_the_probability(predictor):
+    as_of = date(2011, 6, 1)
+    plain = predictor.score_active_permits(as_of)
+    rich = predictor.score_active_permits(as_of, return_features=True)
+    assert "dist_uw_km" in rich.columns and "kw_addition" in rich.columns
+    merged = plain.merge(rich[["permit_num", "probability_issued_90d"]], on="permit_num", suffixes=("", "_rich"))
+    assert (merged["probability_issued_90d"] - merged["probability_issued_90d_rich"]).abs().max() < 1e-12
+
+
 @pytest.mark.integration
 def test_production_artifacts_end_to_end():
     paths = get_paths()

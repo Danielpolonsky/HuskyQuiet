@@ -41,6 +41,23 @@ python -m huskyquiet --log-file reports\pipeline_log.txt all --skip-download   #
 An optional free Socrata app token (`$env:SOCRATA_APP_TOKEN = "..."`) raises API rate
 limits. No paid services are used.
 
+## Web application
+
+```powershell
+python -m streamlit run streamlit_app.py
+```
+
+Open the URL Streamlit prints (usually http://localhost:8501). The app scores the permits
+already on disk. It does not retrain or redownload. Pages:
+
+* **Explore map** — pending applications at their recorded coordinates, colored by predicted issuance probability, with University District, University Village, Roosevelt, Wallingford, and Ravenna filters.
+* **Analyze address** — geocode a Seattle address (or type coordinates) and summarize permits within 250 m, 500 m, or 1 km.
+* **Compare apartments** — the same summary for two addresses, with a paragraph computed from the counts.
+* **Model performance** — ROC-AUC, PR-AUC, Brier, calibration, backtest, and feature importance read from `reports/metrics.json`.
+* **About** — what the number means, how to refresh the data, and where the area boundaries come from.
+
+"Expected issuances" is the sum of predicted issuance probabilities. It is not a noise forecast and not a count of construction starts. Refresh and deployment are documented in [`docs/deployment.md`](docs/deployment.md).
+
 ## Using the model
 
 ```python
