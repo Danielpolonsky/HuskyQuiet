@@ -119,7 +119,9 @@ def permit_table(frame: pd.DataFrame, *, key: str, alt: str, selectable: bool = 
         key=key,
         column_config={
             "Estimated cost": st.column_config.NumberColumn(format="$%,.0f"),
-            "P(issued in 90 days)": st.column_config.NumberColumn(format="%.1%", min_value=0, max_value=1),
+            "P(issued in 90 days)": st.column_config.ProgressColumn(
+                min_value=0, max_value=1, format="percent"
+            ),
             "Distance (m)": st.column_config.NumberColumn(format="%.0f"),
         },
         alt=alt,

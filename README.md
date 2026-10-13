@@ -23,8 +23,8 @@ pip install -r requirements.txt   # exact pinned versions
 pip install -e . --no-deps        # installs the `huskyquiet` package from src/
 
 python -m huskyquiet all          # download -> clean -> audit -> snapshots -> train (~20 min)
-python -m pytest                  # 40 tests (the integration test uses the built artifacts)
-python -m pytest -m "not integration"   # 39 tests, no data needed
+python -m pytest                  # 66 tests (integration tests use the built artifacts)
+python -m pytest -m "not integration"   # 61 tests, no model files required
 ```
 
 Individual stages:

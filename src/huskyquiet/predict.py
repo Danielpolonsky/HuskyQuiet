@@ -308,7 +308,7 @@ class IssuancePredictor:
         snaps = rs.merge(self.history[list(PERMIT_ATTRIBUTE_COLUMNS)], on="permit_num", how="left")
         probs, feats = self._score(snaps)
         cols = ["permit_num", "applied_date", "permit_type_mapped", "permit_class", "permit_type_desc",
-                "description", "est_project_cost", "latitude", "longitude", "address_key"]
+                "description", "est_project_cost", "related_mup", "latitude", "longitude", "zip", "address_key"]
         out = snaps[["permit_num", "age_days"]].merge(self.history[cols], on="permit_num", how="left")
         out["forecast_date"] = t
         out["probability_issued_90d"] = probs
