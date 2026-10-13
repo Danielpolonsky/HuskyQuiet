@@ -1,0 +1,12 @@
+{
+  "data_as_of": "2026-10-10",
+  "horizon_days": 90,
+  "max_application_age_days": 730,
+  "n_snapshots": 508292,
+  "n_permits": 79494,
+  "n_forecast_dates": 223,
+  "first_forecast_date": "2008-01-01",
+  "last_forecast_date": "2026-07-01",
+  "positive_rate": 0.31512398385180174,
+  "mean_snapshots_per_permit": 6.394092635922208
+}

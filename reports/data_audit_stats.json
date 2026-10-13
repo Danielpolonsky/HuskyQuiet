@@ -1,0 +1,1224 @@
+{
+  "n_records": 193610,
+  "null_rate": {
+    "days_issue_permit_city": 0.9618,
+    "parent_permit_num": 0.95,
+    "related_mup": 0.9255,
+    "development_site": 0.8567,
+    "dwelling_unit_type": 0.8477,
+    "standard_plan": 0.8474,
+    "zoning": 0.8474,
+    "contractor_company_name": 0.8342,
+    "total_days_plan_review": 0.8271,
+    "days_plan_review_city": 0.8271,
+    "plan_review_complete_date": 0.8269,
+    "days_initial_plan_review": 0.8246,
+    "initial_review_complete_date": 0.8243,
+    "ready_to_issue_date": 0.7141,
+    "housing_units_added": 0.524,
+    "housing_units_removed": 0.524,
+    "completed_date": 0.4435,
+    "issued_date": 0.2733,
+    "expires_date": 0.2723,
+    "applied_date": 0.2379,
+    "est_project_cost": 0.182,
+    "days_out_corrections": 0.0704,
+    "permit_type_desc": 0.0679,
+    "number_review_cycles": 0.0574,
+    "zip": 0.0526,
+    "city": 0.0469,
+    "state": 0.0461,
+    "permit_suffix": 0.0066,
+    "latitude": 0.0058,
+    "longitude": 0.0058,
+    "address": 0.005,
+    "address_key": 0.005,
+    "description": 0.0041,
+    "socrata_id": 0.0,
+    "socrata_updated_at": 0.0,
+    "socrata_version": 0.0,
+    "permit_num": 0.0,
+    "socrata_created_at": 0.0,
+    "permit_class_mapped": 0.0,
+    "permit_type_mapped": 0.0,
+    "housing_category": 0.0,
+    "dependent_building": 0.0,
+    "link": 0.0,
+    "housing_units": 0.0,
+    "status_current": 0.0,
+    "permit_class": 0.0,
+    "q_applieddate_sentinel": 0.0,
+    "q_issueddate_sentinel": 0.0,
+    "q_completeddate_sentinel": 0.0,
+    "q_expiresdate_sentinel": 0.0,
+    "q_initialreviewcompletedate_sentinel": 0.0,
+    "q_planreviewcompletedate_sentinel": 0.0,
+    "q_coords_missing": 0.0,
+    "q_readytoissuedate_sentinel": 0.0,
+    "q_issued_before_applied": 0.0,
+    "is_model_eligible": 0.0
+  },
+  "date_coverage": {
+    "min_applied": "1990-03-21",
+    "max_applied": "2026-10-10",
+    "min_issued": "1992-06-19",
+    "max_issued": "2026-10-10"
+  },
+  "applications_by_year": [
+    {
+      "year": 1990,
+      "n": 6,
+      "share_never_issued": 0.0
+    },
+    {
+      "year": 1992,
+      "n": 8,
+      "share_never_issued": 0.0
+    },
+    {
+      "year": 1994,
+      "n": 2,
+      "share_never_issued": 0.0
+    },
+    {
+      "year": 1995,
+      "n": 4,
+      "share_never_issued": 0.0
+    },
+    {
+      "year": 1996,
+      "n": 5,
+      "share_never_issued": 0.0
+    },
+    {
+      "year": 1997,
+      "n": 5,
+      "share_never_issued": 0.0
+    },
+    {
+      "year": 1998,
+      "n": 7,
+      "share_never_issued": 0.0
+    },
+    {
+      "year": 1999,
+      "n": 15,
+      "share_never_issued": 0.0
+    },
+    {
+      "year": 2000,
+      "n": 24,
+      "share_never_issued": 0.08333333333333333
+    },
+    {
+      "year": 2001,
+      "n": 38,
+      "share_never_issued": 0.02631578947368421
+    },
+    {
+      "year": 2002,
+      "n": 83,
+      "share_never_issued": 0.03614457831325301
+    },
+    {
+      "year": 2003,
+      "n": 171,
+      "share_never_issued": 0.023391812865497075
+    },
+    {
+      "year": 2004,
+      "n": 392,
+      "share_never_issued": 0.01020408163265306
+    },
+    {
+      "year": 2005,
+      "n": 3149,
+      "share_never_issued": 0.028580501746586218
+    },
+    {
+      "year": 2006,
+      "n": 8316,
+      "share_never_issued": 0.02861952861952862
+    },
+    {
+      "year": 2007,
+      "n": 7634,
+      "share_never_issued": 0.05436206444851978
+    },
+    {
+      "year": 2008,
+      "n": 6353,
+      "share_never_issued": 0.06374940972768771
+    },
+    {
+      "year": 2009,
+      "n": 4897,
+      "share_never_issued": 0.027772105370635083
+    },
+    {
+      "year": 2010,
+      "n": 5240,
+      "share_never_issued": 0.024427480916030534
+    },
+    {
+      "year": 2011,
+      "n": 5628,
+      "share_never_issued": 0.02398720682302772
+    },
+    {
+      "year": 2012,
+      "n": 5994,
+      "share_never_issued": 0.021021021021021023
+    },
+    {
+      "year": 2013,
+      "n": 7409,
+      "share_never_issued": 0.022270211904440545
+    },
+    {
+      "year": 2014,
+      "n": 7659,
+      "share_never_issued": 0.027549288418853637
+    },
+    {
+      "year": 2015,
+      "n": 8093,
+      "share_never_issued": 0.024712714691708885
+    },
+    {
+      "year": 2016,
+      "n": 8457,
+      "share_never_issued": 0.03488234598557408
+    },
+    {
+      "year": 2017,
+      "n": 8591,
+      "share_never_issued": 0.04004190431847282
+    },
+    {
+      "year": 2018,
+      "n": 8409,
+      "share_never_issued": 0.05303841122606731
+    },
+    {
+      "year": 2019,
+      "n": 7646,
+      "share_never_issued": 0.06199319905833115
+    },
+    {
+      "year": 2020,
+      "n": 6550,
+      "share_never_issued": 0.07099236641221374
+    },
+    {
+      "year": 2021,
+      "n": 7056,
+      "share_never_issued": 0.06604308390022676
+    },
+    {
+      "year": 2022,
+      "n": 6770,
+      "share_never_issued": 0.0930576070901034
+    },
+    {
+      "year": 2023,
+      "n": 5603,
+      "share_never_issued": 0.08888095663037658
+    },
+    {
+      "year": 2024,
+      "n": 6064,
+      "share_never_issued": 0.08756596306068602
+    },
+    {
+      "year": 2025,
+      "n": 6257,
+      "share_never_issued": 0.11571040434713122
+    },
+    {
+      "year": 2026,
+      "n": 5017,
+      "share_never_issued": 0.3683476180984652
+    }
+  ],
+  "status_counts": [
+    {
+      "status_current": "Completed",
+      "n": 134505
+    },
+    {
+      "status_current": "Expired",
+      "n": 13765
+    },
+    {
+      "status_current": "Additional Info Requested",
+      "n": 10256
+    },
+    {
+      "status_current": "Closed",
+      "n": 8967
+    },
+    {
+      "status_current": "Issued",
+      "n": 8236
+    },
+    {
+      "status_current": "Withdrawn",
+      "n": 5210
+    },
+    {
+      "status_current": "Canceled",
+      "n": 4577
+    },
+    {
+      "status_current": "Corrections Required",
+      "n": 2115
+    },
+    {
+      "status_current": "Scheduled",
+      "n": 1895
+    },
+    {
+      "status_current": "Application Completed",
+      "n": 724
+    },
+    {
+      "status_current": "Ready for Issuance",
+      "n": 697
+    },
+    {
+      "status_current": "Reviews In Process",
+      "n": 610
+    },
+    {
+      "status_current": "Awaiting Information",
+      "n": 519
+    },
+    {
+      "status_current": "Reviews Completed",
+      "n": 488
+    },
+    {
+      "status_current": "Ready for Intake",
+      "n": 289
+    },
+    {
+      "status_current": "Active",
+      "n": 268
+    },
+    {
+      "status_current": "Initiated",
+      "n": 223
+    },
+    {
+      "status_current": "Inspections Completed",
+      "n": 141
+    },
+    {
+      "status_current": "Scheduled and Submitted",
+      "n": 52
+    },
+    {
+      "status_current": "Corrections Submitted",
+      "n": 32
+    },
+    {
+      "status_current": "Approved to Occupy",
+      "n": 26
+    },
+    {
+      "status_current": "Phase Issued",
+      "n": 12
+    },
+    {
+      "status_current": "Pending",
+      "n": 2
+    },
+    {
+      "status_current": "Denied",
+      "n": 1
+    }
+  ],
+  "permit_type_counts": [
+    {
+      "permit_type_mapped": "Building",
+      "permit_class": "Single Family/Duplex",
+      "n": 89145
+    },
+    {
+      "permit_type_mapped": "Building",
+      "permit_class": "Commercial",
+      "n": 37691
+    },
+    {
+      "permit_type_mapped": "Building",
+      "permit_class": "Multifamily",
+      "n": 16373
+    },
+    {
+      "permit_type_mapped": "ECA and Shoreline Exemption/Street Improvement Exception Request",
+      "permit_class": "Single Family/Duplex",
+      "n": 11633
+    },
+    {
+      "permit_type_mapped": "Demolition",
+      "permit_class": "Single Family/Duplex",
+      "n": 10280
+    },
+    {
+      "permit_type_mapped": "Building",
+      "permit_class": "N/A",
+      "n": 5800
+    },
+    {
+      "permit_type_mapped": "Building",
+      "permit_class": "Institutional",
+      "n": 4435
+    },
+    {
+      "permit_type_mapped": "Demolition",
+      "permit_class": "Multifamily",
+      "n": 3157
+    },
+    {
+      "permit_type_mapped": "ECA and Shoreline Exemption/Street Improvement Exception Request",
+      "permit_class": "Commercial",
+      "n": 2982
+    },
+    {
+      "permit_type_mapped": "Demolition",
+      "permit_class": "Commercial",
+      "n": 1922
+    },
+    {
+      "permit_type_mapped": "ECA and Shoreline Exemption/Street Improvement Exception Request",
+      "permit_class": "Multifamily",
+      "n": 1803
+    },
+    {
+      "permit_type_mapped": "Building",
+      "permit_class": "Industrial",
+      "n": 1653
+    },
+    {
+      "permit_type_mapped": "Roof",
+      "permit_class": "Single Family/Duplex",
+      "n": 1170
+    },
+    {
+      "permit_type_mapped": "ECA and Shoreline Exemption/Street Improvement Exception Request",
+      "permit_class": "N/A",
+      "n": 1038
+    },
+    {
+      "permit_type_mapped": "ECA and Shoreline Exemption/Street Improvement Exception Request",
+      "permit_class": "Institutional",
+      "n": 719
+    },
+    {
+      "permit_type_mapped": "ECA and Shoreline Exemption/Street Improvement Exception Request",
+      "permit_class": "Industrial",
+      "n": 567
+    },
+    {
+      "permit_type_mapped": "Grading",
+      "permit_class": "Single Family/Duplex",
+      "n": 471
+    },
+    {
+      "permit_type_mapped": "Roof",
+      "permit_class": "Multifamily",
+      "n": 447
+    },
+    {
+      "permit_type_mapped": "Demolition",
+      "permit_class": "Institutional",
+      "n": 413
+    },
+    {
+      "permit_type_mapped": "Roof",
+      "permit_class": "Commercial",
+      "n": 399
+    },
+    {
+      "permit_type_mapped": "Building",
+      "permit_class": "Vacant Land",
+      "n": 281
+    },
+    {
+      "permit_type_mapped": "Grading",
+      "permit_class": "Commercial",
+      "n": 273
+    },
+    {
+      "permit_type_mapped": "Demolition",
+      "permit_class": "Industrial",
+      "n": 260
+    },
+    {
+      "permit_type_mapped": "ECA and Shoreline Exemption/Street Improvement Exception Request",
+      "permit_class": "Vacant Land",
+      "n": 138
+    },
+    {
+      "permit_type_mapped": "Grading",
+      "permit_class": "Institutional",
+      "n": 131
+    },
+    {
+      "permit_type_mapped": "Grading",
+      "permit_class": "Industrial",
+      "n": 100
+    },
+    {
+      "permit_type_mapped": "Demolition",
+      "permit_class": "N/A",
+      "n": 85
+    },
+    {
+      "permit_type_mapped": "Grading",
+      "permit_class": "Multifamily",
+      "n": 77
+    },
+    {
+      "permit_type_mapped": "Roof",
+      "permit_class": "Institutional",
+      "n": 50
+    },
+    {
+      "permit_type_mapped": "Roof",
+      "permit_class": "Industrial",
+      "n": 44
+    },
+    {
+      "permit_type_mapped": "Grading",
+      "permit_class": "Vacant Land",
+      "n": 30
+    },
+    {
+      "permit_type_mapped": "Demolition",
+      "permit_class": "Vacant Land",
+      "n": 25
+    },
+    {
+      "permit_type_mapped": "Grading",
+      "permit_class": "N/A",
+      "n": 18
+    }
+  ],
+  "by_suffix": [
+    {
+      "permit_suffix": "CN",
+      "n": 148864,
+      "share_applied_missing": 0.1413303417884781,
+      "share_issued_missing": 0.19217540842648323,
+      "share_model_eligible": 0.8585756126397248
+    },
+    {
+      "permit_suffix": "EX",
+      "n": 17603,
+      "share_applied_missing": 1.0,
+      "share_issued_missing": 1.0,
+      "share_model_eligible": 0.0
+    },
+    {
+      "permit_suffix": "DM",
+      "n": 16142,
+      "share_applied_missing": 0.19601040763226366,
+      "share_issued_missing": 0.2499690249039772,
+      "share_model_eligible": 0.8039895923677364
+    },
+    {
+      "permit_suffix": "BK",
+      "n": 5182,
+      "share_applied_missing": 0.05866460825935932,
+      "share_issued_missing": 0.1038209185642609,
+      "share_model_eligible": 0.9413353917406406
+    },
+    {
+      "permit_suffix": "RR",
+      "n": 2110,
+      "share_applied_missing": 0.9635071090047393,
+      "share_issued_missing": 0.004739336492890996,
+      "share_model_eligible": 0.036492890995260666
+    },
+    {
+      "permit_suffix": NaN,
+      "n": 1277,
+      "share_applied_missing": 1.0,
+      "share_issued_missing": 1.0,
+      "share_model_eligible": 0.0
+    },
+    {
+      "permit_suffix": "GR",
+      "n": 1100,
+      "share_applied_missing": 0.46454545454545454,
+      "share_issued_missing": 0.5536363636363636,
+      "share_model_eligible": 0.5354545454545454
+    },
+    {
+      "permit_suffix": "CC",
+      "n": 792,
+      "share_applied_missing": 0.11616161616161616,
+      "share_issued_missing": 0.11868686868686869,
+      "share_model_eligible": 0.8838383838383839
+    },
+    {
+      "permit_suffix": "PH",
+      "n": 540,
+      "share_applied_missing": 0.06481481481481481,
+      "share_issued_missing": 0.2611111111111111,
+      "share_model_eligible": 0.9351851851851852
+    }
+  ],
+  "applied_missing_by_status": [
+    {
+      "status_current": "Completed",
+      "n": 18539
+    },
+    {
+      "status_current": "Additional Info Requested",
+      "n": 10241
+    },
+    {
+      "status_current": "Closed",
+      "n": 8309
+    },
+    {
+      "status_current": "Withdrawn",
+      "n": 3891
+    },
+    {
+      "status_current": "Scheduled",
+      "n": 1895
+    },
+    {
+      "status_current": "Canceled",
+      "n": 827
+    },
+    {
+      "status_current": "Expired",
+      "n": 715
+    },
+    {
+      "status_current": "Issued",
+      "n": 320
+    },
+    {
+      "status_current": "Ready for Intake",
+      "n": 287
+    },
+    {
+      "status_current": "Active",
+      "n": 268
+    },
+    {
+      "status_current": "Initiated",
+      "n": 222
+    },
+    {
+      "status_current": "Corrections Required",
+      "n": 211
+    },
+    {
+      "status_current": "Reviews Completed",
+      "n": 197
+    },
+    {
+      "status_current": "Scheduled and Submitted",
+      "n": 52
+    },
+    {
+      "status_current": "Reviews In Process",
+      "n": 45
+    },
+    {
+      "status_current": "Application Completed",
+      "n": 17
+    },
+    {
+      "status_current": "Ready for Issuance",
+      "n": 16
+    },
+    {
+      "status_current": "Awaiting Information",
+      "n": 3
+    },
+    {
+      "status_current": "Pending",
+      "n": 2
+    },
+    {
+      "status_current": "Corrections Submitted",
+      "n": 1
+    }
+  ],
+  "applied_to_issued_days": {
+    "n": 137812,
+    "quantiles": {
+      "0.25": 0.0,
+      "0.5": 32.0,
+      "0.75": 114.0,
+      "0.9": 251.0,
+      "0.95": 376.0,
+      "0.99": 842.0
+    },
+    "share_same_day": 0.3163512611383624,
+    "share_within_90d": 0.6977186311787072,
+    "share_within_730d": 0.9862638957420253
+  },
+  "missingness_by_eventual_issuance": [
+    {
+      "eventually_issued": false,
+      "n": 5114,
+      "est_project_cost": 0.04947203754399687,
+      "housing_units_added": 0.4288228392647634,
+      "related_mup": 0.8603832616347282,
+      "latitude": 0.0037152913570590537,
+      "permit_type_desc": 0.030700039108330076,
+      "contractor_company_name": 0.8963629253030896,
+      "parent_permit_num": 0.9992178333985139,
+      "zoning": 0.9988267500977708,
+      "dwelling_unit_type": 0.9988267500977708,
+      "standard_plan": 0.9988267500977708,
+      "development_site": 0.9988267500977708,
+      "ready_to_issue_date": 0.916112631990614,
+      "total_days_plan_review": 0.8934298005475166,
+      "dependent_building_true": 0.00039108330074305825
+    },
+    {
+      "eventually_issued": true,
+      "n": 100055,
+      "est_project_cost": 0.07484883314177203,
+      "housing_units_added": 0.4048873119784119,
+      "related_mup": 0.915636399980011,
+      "latitude": 0.0012393183748938084,
+      "permit_type_desc": 0.014611963420118935,
+      "contractor_company_name": 0.8215681375243616,
+      "parent_permit_num": 0.9332567088101544,
+      "zoning": 0.773024836340013,
+      "dwelling_unit_type": 0.7733646494428065,
+      "standard_plan": 0.7730148418369897,
+      "development_site": 0.7904052770975963,
+      "ready_to_issue_date": 0.5619609214931788,
+      "total_days_plan_review": 0.7297986107640797,
+      "dependent_building_true": 0.022567587826695316
+    }
+  ],
+  "housing_category_by_eventual_issuance": [
+    {
+      "housing_category": "Single-Family Add/Alt",
+      "issued": 38985,
+      "never_issued": 1407
+    },
+    {
+      "housing_category": "N/A",
+      "issued": 25151,
+      "never_issued": 2822
+    },
+    {
+      "housing_category": "Commercial Add/Alt",
+      "issued": 18991,
+      "never_issued": 885
+    },
+    {
+      "housing_category": "Middle Housing",
+      "issued": 14920,
+      "never_issued": 0
+    },
+    {
+      "housing_category": "Large Multifamily",
+      "issued": 1258,
+      "never_issued": 0
+    },
+    {
+      "housing_category": "Multifamily - Other",
+      "issued": 450,
+      "never_issued": 0
+    },
+    {
+      "housing_category": "Pre-Approved DADU Plans",
+      "issued": 300,
+      "never_issued": 0
+    }
+  ],
+  "description_admin_keywords_by_eventual_issuance": [
+    {
+      "eventually_issued": false,
+      "n": 5114,
+      "cancel": 0.1812671098944075,
+      "withdraw": 0.00919045756746187,
+      "expire": 0.003324208056315995,
+      "extension": 0.009777082518576457,
+      "embedded_date": 0.17813844348846306
+    },
+    {
+      "eventually_issued": true,
+      "n": 100055,
+      "cancel": 0.002808539559429097,
+      "withdraw": 0.00015991684324151442,
+      "expire": 0.03899972014552433,
+      "extension": 0.0027085915324031504,
+      "embedded_date": 0.010734418102586655
+    }
+  ],
+  "est_project_cost": {
+    "n_zero": 2996,
+    "median": 70275.0,
+    "p99": 18550000.0,
+    "max": 25000000000.0
+  },
+  "cost_missing_by_applied_year": [
+    {
+      "year": 2005,
+      "share_missing": 0.17084788821848207
+    },
+    {
+      "year": 2006,
+      "share_missing": 0.17267917267917268
+    },
+    {
+      "year": 2007,
+      "share_missing": 0.16164527115535762
+    },
+    {
+      "year": 2008,
+      "share_missing": 0.14198016685030695
+    },
+    {
+      "year": 2009,
+      "share_missing": 0.07902797631202778
+    },
+    {
+      "year": 2010,
+      "share_missing": 0.09580152671755725
+    },
+    {
+      "year": 2011,
+      "share_missing": 0.10945273631840796
+    },
+    {
+      "year": 2012,
+      "share_missing": 0.12045378712045379
+    },
+    {
+      "year": 2013,
+      "share_missing": 0.1297071129707113
+    },
+    {
+      "year": 2014,
+      "share_missing": 0.1445358401880141
+    },
+    {
+      "year": 2015,
+      "share_missing": 0.15865562832077104
+    },
+    {
+      "year": 2016,
+      "share_missing": 0.14142130779236137
+    },
+    {
+      "year": 2017,
+      "share_missing": 0.1252473518798743
+    },
+    {
+      "year": 2018,
+      "share_missing": 0.03294089665834225
+    },
+    {
+      "year": 2019,
+      "share_missing": 0.00013078733978550875
+    },
+    {
+      "year": 2020,
+      "share_missing": 0.0
+    },
+    {
+      "year": 2021,
+      "share_missing": 0.0
+    },
+    {
+      "year": 2022,
+      "share_missing": 0.0
+    },
+    {
+      "year": 2023,
+      "share_missing": 0.0
+    },
+    {
+      "year": 2024,
+      "share_missing": 0.0
+    },
+    {
+      "year": 2025,
+      "share_missing": 0.0
+    },
+    {
+      "year": 2026,
+      "share_missing": 0.0
+    }
+  ],
+  "distinct_addresses": 86392,
+  "recent_cohort_pending_vs_issued": [
+    {
+      "group": "issued",
+      "permit_class": "Commercial",
+      "n": 1003,
+      "null_est_project_cost": 0.0,
+      "null_housing_units_added": 0.4227,
+      "null_housing_units_removed": 0.4227,
+      "null_related_mup": 0.986,
+      "null_permit_type_desc": 0.013,
+      "null_latitude": 0.002,
+      "null_zip": 0.0548,
+      "null_address_key": 0.0,
+      "null_description": 0.0,
+      "median_est_project_cost": 100000.0,
+      "kw_new_construction": 0.0189,
+      "kw_demolition": 0.0219,
+      "kw_adu": 0.0,
+      "kw_townhouse": 0.0,
+      "kw_multifamily": 0.1017,
+      "kw_tenant_improvement": 0.5603,
+      "kw_stfi": 0.2243,
+      "kw_change_of_use": 0.0967,
+      "kw_establish_use": 0.0219,
+      "kw_earthwork": 0.008,
+      "kw_seismic": 0.004,
+      "kw_solar": 0.001,
+      "kw_deck_porch": 0.01,
+      "kw_basement": 0.014,
+      "kw_addition": 0.01
+    },
+    {
+      "group": "issued",
+      "permit_class": "Industrial",
+      "n": 64,
+      "null_est_project_cost": 0.0,
+      "null_housing_units_added": 0.2656,
+      "null_housing_units_removed": 0.2656,
+      "null_related_mup": 0.9375,
+      "null_permit_type_desc": 0.1094,
+      "null_latitude": 0.0,
+      "null_zip": 0.0156,
+      "null_address_key": 0.0,
+      "null_description": 0.0,
+      "median_est_project_cost": 273600.0,
+      "kw_new_construction": 0.0781,
+      "kw_demolition": 0.1094,
+      "kw_adu": 0.0,
+      "kw_townhouse": 0.0,
+      "kw_multifamily": 0.0156,
+      "kw_tenant_improvement": 0.1094,
+      "kw_stfi": 0.0781,
+      "kw_change_of_use": 0.0156,
+      "kw_establish_use": 0.0,
+      "kw_earthwork": 0.125,
+      "kw_seismic": 0.0,
+      "kw_solar": 0.0,
+      "kw_deck_porch": 0.0,
+      "kw_basement": 0.0,
+      "kw_addition": 0.0625
+    },
+    {
+      "group": "issued",
+      "permit_class": "Institutional",
+      "n": 151,
+      "null_est_project_cost": 0.0,
+      "null_housing_units_added": 0.298,
+      "null_housing_units_removed": 0.298,
+      "null_related_mup": 0.9669,
+      "null_permit_type_desc": 0.0265,
+      "null_latitude": 0.0066,
+      "null_zip": 0.0662,
+      "null_address_key": 0.0066,
+      "null_description": 0.0,
+      "median_est_project_cost": 112000.0,
+      "kw_new_construction": 0.0464,
+      "kw_demolition": 0.0728,
+      "kw_adu": 0.0,
+      "kw_townhouse": 0.0,
+      "kw_multifamily": 0.0066,
+      "kw_tenant_improvement": 0.1325,
+      "kw_stfi": 0.2185,
+      "kw_change_of_use": 0.0199,
+      "kw_establish_use": 0.0066,
+      "kw_earthwork": 0.0265,
+      "kw_seismic": 0.0265,
+      "kw_solar": 0.0,
+      "kw_deck_porch": 0.0132,
+      "kw_basement": 0.0132,
+      "kw_addition": 0.0132
+    },
+    {
+      "group": "issued",
+      "permit_class": "Multifamily",
+      "n": 364,
+      "null_est_project_cost": 0.0,
+      "null_housing_units_added": 0.2418,
+      "null_housing_units_removed": 0.2418,
+      "null_related_mup": 0.8956,
+      "null_permit_type_desc": 0.0495,
+      "null_latitude": 0.0,
+      "null_zip": 0.0604,
+      "null_address_key": 0.0,
+      "null_description": 0.0,
+      "median_est_project_cost": 100000.0,
+      "kw_new_construction": 0.033,
+      "kw_demolition": 0.2308,
+      "kw_adu": 0.0055,
+      "kw_townhouse": 0.0495,
+      "kw_multifamily": 0.7225,
+      "kw_tenant_improvement": 0.0797,
+      "kw_stfi": 0.239,
+      "kw_change_of_use": 0.0247,
+      "kw_establish_use": 0.0577,
+      "kw_earthwork": 0.0137,
+      "kw_seismic": 0.0275,
+      "kw_solar": 0.0,
+      "kw_deck_porch": 0.0412,
+      "kw_basement": 0.022,
+      "kw_addition": 0.0192
+    },
+    {
+      "group": "issued",
+      "permit_class": "Single Family/Duplex",
+      "n": 3545,
+      "null_est_project_cost": 0.0,
+      "null_housing_units_added": 0.3362,
+      "null_housing_units_removed": 0.3362,
+      "null_related_mup": 0.989,
+      "null_permit_type_desc": 0.0302,
+      "null_latitude": 0.0006,
+      "null_zip": 0.0669,
+      "null_address_key": 0.0,
+      "null_description": 0.0,
+      "median_est_project_cost": 124960.0,
+      "kw_new_construction": 0.1763,
+      "kw_demolition": 0.1044,
+      "kw_adu": 0.0976,
+      "kw_townhouse": 0.0432,
+      "kw_multifamily": 0.0087,
+      "kw_tenant_improvement": 0.0003,
+      "kw_stfi": 0.341,
+      "kw_change_of_use": 0.0037,
+      "kw_establish_use": 0.2039,
+      "kw_earthwork": 0.0144,
+      "kw_seismic": 0.0347,
+      "kw_solar": 0.0003,
+      "kw_deck_porch": 0.0567,
+      "kw_basement": 0.0559,
+      "kw_addition": 0.1405
+    },
+    {
+      "group": "issued",
+      "permit_class": "Vacant Land",
+      "n": 14,
+      "null_est_project_cost": 0.0,
+      "null_housing_units_added": 0.1429,
+      "null_housing_units_removed": 0.1429,
+      "null_related_mup": 0.9286,
+      "null_permit_type_desc": 0.1429,
+      "null_latitude": 0.0,
+      "null_zip": 0.0,
+      "null_address_key": 0.0,
+      "null_description": 0.0,
+      "median_est_project_cost": 65000.0,
+      "kw_new_construction": 0.0,
+      "kw_demolition": 0.2143,
+      "kw_adu": 0.0,
+      "kw_townhouse": 0.0,
+      "kw_multifamily": 0.0714,
+      "kw_tenant_improvement": 0.0,
+      "kw_stfi": 0.0,
+      "kw_change_of_use": 0.0,
+      "kw_establish_use": 0.0,
+      "kw_earthwork": 0.1429,
+      "kw_seismic": 0.0,
+      "kw_solar": 0.0,
+      "kw_deck_porch": 0.0,
+      "kw_basement": 0.0,
+      "kw_addition": 0.0
+    },
+    {
+      "group": "pending_or_never",
+      "permit_class": "Commercial",
+      "n": 359,
+      "null_est_project_cost": 0.0,
+      "null_housing_units_added": 0.507,
+      "null_housing_units_removed": 0.507,
+      "null_related_mup": 0.9721,
+      "null_permit_type_desc": 0.0279,
+      "null_latitude": 0.0,
+      "null_zip": 0.0529,
+      "null_address_key": 0.0,
+      "null_description": 0.0,
+      "median_est_project_cost": 150000.0,
+      "kw_new_construction": 0.0251,
+      "kw_demolition": 0.039,
+      "kw_adu": 0.0,
+      "kw_townhouse": 0.0056,
+      "kw_multifamily": 0.0975,
+      "kw_tenant_improvement": 0.429,
+      "kw_stfi": 0.0752,
+      "kw_change_of_use": 0.117,
+      "kw_establish_use": 0.0529,
+      "kw_earthwork": 0.0279,
+      "kw_seismic": 0.0056,
+      "kw_solar": 0.0028,
+      "kw_deck_porch": 0.0028,
+      "kw_basement": 0.0167,
+      "kw_addition": 0.0418
+    },
+    {
+      "group": "pending_or_never",
+      "permit_class": "Industrial",
+      "n": 52,
+      "null_est_project_cost": 0.0,
+      "null_housing_units_added": 0.6538,
+      "null_housing_units_removed": 0.6538,
+      "null_related_mup": 0.8846,
+      "null_permit_type_desc": 0.0962,
+      "null_latitude": 0.0,
+      "null_zip": 0.0385,
+      "null_address_key": 0.0,
+      "null_description": 0.0,
+      "median_est_project_cost": 862000.0,
+      "kw_new_construction": 0.0577,
+      "kw_demolition": 0.25,
+      "kw_adu": 0.0,
+      "kw_townhouse": 0.0,
+      "kw_multifamily": 0.0192,
+      "kw_tenant_improvement": 0.0577,
+      "kw_stfi": 0.1731,
+      "kw_change_of_use": 0.0577,
+      "kw_establish_use": 0.0577,
+      "kw_earthwork": 0.0769,
+      "kw_seismic": 0.0,
+      "kw_solar": 0.0,
+      "kw_deck_porch": 0.0192,
+      "kw_basement": 0.0,
+      "kw_addition": 0.0962
+    },
+    {
+      "group": "pending_or_never",
+      "permit_class": "Institutional",
+      "n": 91,
+      "null_est_project_cost": 0.0,
+      "null_housing_units_added": 0.4286,
+      "null_housing_units_removed": 0.4286,
+      "null_related_mup": 0.8791,
+      "null_permit_type_desc": 0.011,
+      "null_latitude": 0.0,
+      "null_zip": 0.044,
+      "null_address_key": 0.0,
+      "null_description": 0.0,
+      "median_est_project_cost": 506800.0,
+      "kw_new_construction": 0.022,
+      "kw_demolition": 0.0549,
+      "kw_adu": 0.0,
+      "kw_townhouse": 0.0,
+      "kw_multifamily": 0.033,
+      "kw_tenant_improvement": 0.0989,
+      "kw_stfi": 0.033,
+      "kw_change_of_use": 0.044,
+      "kw_establish_use": 0.033,
+      "kw_earthwork": 0.022,
+      "kw_seismic": 0.011,
+      "kw_solar": 0.0,
+      "kw_deck_porch": 0.0,
+      "kw_basement": 0.022,
+      "kw_addition": 0.0659
+    },
+    {
+      "group": "pending_or_never",
+      "permit_class": "Multifamily",
+      "n": 255,
+      "null_est_project_cost": 0.0,
+      "null_housing_units_added": 0.4196,
+      "null_housing_units_removed": 0.4196,
+      "null_related_mup": 0.8745,
+      "null_permit_type_desc": 0.0196,
+      "null_latitude": 0.0039,
+      "null_zip": 0.0431,
+      "null_address_key": 0.0039,
+      "null_description": 0.0,
+      "median_est_project_cost": 664562.0,
+      "kw_new_construction": 0.2078,
+      "kw_demolition": 0.0902,
+      "kw_adu": 0.0078,
+      "kw_townhouse": 0.2588,
+      "kw_multifamily": 0.549,
+      "kw_tenant_improvement": 0.0275,
+      "kw_stfi": 0.0392,
+      "kw_change_of_use": 0.0235,
+      "kw_establish_use": 0.4157,
+      "kw_earthwork": 0.0235,
+      "kw_seismic": 0.0118,
+      "kw_solar": 0.0,
+      "kw_deck_porch": 0.0314,
+      "kw_basement": 0.0196,
+      "kw_addition": 0.0588
+    },
+    {
+      "group": "pending_or_never",
+      "permit_class": "Single Family/Duplex",
+      "n": 1497,
+      "null_est_project_cost": 0.0,
+      "null_housing_units_added": 0.4963,
+      "null_housing_units_removed": 0.4963,
+      "null_related_mup": 0.9512,
+      "null_permit_type_desc": 0.024,
+      "null_latitude": 0.0,
+      "null_zip": 0.0635,
+      "null_address_key": 0.0,
+      "null_description": 0.0,
+      "median_est_project_cost": 275509.0,
+      "kw_new_construction": 0.2926,
+      "kw_demolition": 0.0868,
+      "kw_adu": 0.1022,
+      "kw_townhouse": 0.0294,
+      "kw_multifamily": 0.014,
+      "kw_tenant_improvement": 0.0,
+      "kw_stfi": 0.0628,
+      "kw_change_of_use": 0.002,
+      "kw_establish_use": 0.4148,
+      "kw_earthwork": 0.0407,
+      "kw_seismic": 0.0047,
+      "kw_solar": 0.0027,
+      "kw_deck_porch": 0.0407,
+      "kw_basement": 0.022,
+      "kw_addition": 0.1336
+    },
+    {
+      "group": "pending_or_never",
+      "permit_class": "Vacant Land",
+      "n": 6,
+      "null_est_project_cost": 0.0,
+      "null_housing_units_added": 1.0,
+      "null_housing_units_removed": 1.0,
+      "null_related_mup": 0.8333,
+      "null_permit_type_desc": 0.3333,
+      "null_latitude": 0.0,
+      "null_zip": 0.1667,
+      "null_address_key": 0.0,
+      "null_description": 0.0,
+      "median_est_project_cost": 115000.0,
+      "kw_new_construction": 0.1667,
+      "kw_demolition": 0.1667,
+      "kw_adu": 0.0,
+      "kw_townhouse": 0.0,
+      "kw_multifamily": 0.0,
+      "kw_tenant_improvement": 0.0,
+      "kw_stfi": 0.0,
+      "kw_change_of_use": 0.0,
+      "kw_establish_use": 0.0,
+      "kw_earthwork": 0.0,
+      "kw_seismic": 0.0,
+      "kw_solar": 0.0,
+      "kw_deck_porch": 0.0,
+      "kw_basement": 0.0,
+      "kw_addition": 0.1667
+    }
+  ]
+}
