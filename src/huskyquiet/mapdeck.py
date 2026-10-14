@@ -16,16 +16,19 @@ import pydeck as pdk
 
 from huskyquiet.analysis import format_probability, probability_color
 from huskyquiet.config import UW_LAT, UW_LON
-from huskyquiet.geo import valid_coordinates, with_distance
+from huskyquiet.geo import valid_coordinates
 
 CARTO_POSITRON = "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json"
 _EARTH_M_PER_DEG = 111_320.0
+_HOME_COLOR = (196, 163, 90, 235)
 
 
 def mappable_permits(frame: pd.DataFrame) -> pd.DataFrame:
     out = frame.loc[valid_coordinates(frame)].copy()
     out["color"] = [probability_color(p) for p in out["probability_issued_90d"]]
-    out["p_label"] = [format_probability(p) for p in out["probability_issued_90d"]]
+    out["p_label"] = [
+        f"Chance issued within 90 days: {format_probability(p)}" for p in out["probability_issued_90d"]
+    ]
     if "address_key" in out.columns:
         out["tip_address"] = out["address_key"].map(_tip_address)
     else:
@@ -34,51 +37,51 @@ def mappable_permits(frame: pd.DataFrame) -> pd.DataFrame:
     return out
 
 
-def city_deck(
+def area_deck(
     permits: pd.DataFrame,
     *,
     latitude: float = UW_LAT,
     longitude: float = UW_LON,
     zoom: float = 13,
+    outline: dict | None = None,
 ) -> pdk.Deck:
-    """City map. Marker color is predicted P(issued within 90 days)."""
-    data = mappable_permits(permits)
-    layers = [
-        _permit_layer(data, zoom),
-        _marker_layer(
-            UW_LON,
-            UW_LAT,
-            zoom,
-            color=(196, 163, 90, 230),
-            tip_address="University of Washington",
-            tip_type="Reference point (Red Square)",
-            p_label="",
-            layer_id="uw",
-        ),
-    ]
+    """Area map with the extent outlined. Marker color is the predicted chance of issuance."""
+    layers = []
+    if outline is not None:
+        layers.append(_outline_layer(outline, zoom))
+    layers.append(_permit_layer(mappable_permits(permits), zoom))
+    layers.append(_marker_layer(
+        UW_LON,
+        UW_LAT,
+        zoom,
+        color=_HOME_COLOR,
+        tip_address="University of Washington",
+        tip_type="Reference point (Red Square)",
+        p_label="",
+        layer_id="uw",
+    ))
     return _deck(layers, latitude, longitude, zoom)
 
 
 def location_deck(
-    permits: pd.DataFrame,
+    nearby: pd.DataFrame,
     latitude: float,
     longitude: float,
     radius_m: float,
+    zoom_offset: float = 0.0,
 ) -> pdk.Deck:
-    """Apartment-centered map with a radius ring and the permits inside it."""
-    nearby = with_distance(permits, latitude, longitude, radius_m)
-    data = mappable_permits(nearby)
-    zoom = 15 if radius_m <= 250 else 14 if radius_m <= 500 else 13
+    """Location-centered map with the search radius and the permits passed in."""
+    zoom = (15 if radius_m <= 250 else 14 if radius_m <= 500 else 13) + zoom_offset
     layers = [
         _ring_layer(longitude, latitude, radius_m, zoom),
-        _permit_layer(data, zoom),
+        _permit_layer(mappable_permits(nearby), zoom),
         _marker_layer(
             longitude,
             latitude,
             zoom,
-            color=(196, 163, 90, 230),
-            tip_address="Selected location",
-            tip_type=f"Search radius {int(radius_m)} m",
+            color=_HOME_COLOR,
+            tip_address="Searched location",
+            tip_type=f"Search radius {int(radius_m):,} m",
             p_label="",
             layer_id="home",
         ),
@@ -167,6 +170,45 @@ def _ring_layer(longitude: float, latitude: float, radius_m: float, zoom: float)
         get_polygon="polygon",
         get_fill_color=[14, 77, 92, 180],
     )
+
+
+def _outline_layer(geometry: dict, zoom: float) -> pdk.Layer:
+    # Drawn as thin quads along each edge for the same reason as the radius ring.
+    half_width = max(_marker_radius_m(zoom) * 0.18, 3.0)
+    rings = geometry["coordinates"] if geometry["type"] == "Polygon" else [
+        ring for polygon in geometry["coordinates"] for ring in polygon
+    ]
+    quads = []
+    for ring in rings:
+        for (lon1, lat1), (lon2, lat2) in zip(ring[:-1], ring[1:], strict=True):
+            quads.append({"polygon": _segment_quad(lon1, lat1, lon2, lat2, half_width)})
+    return pdk.Layer(
+        "SolidPolygonLayer",
+        data=quads,
+        id="extent",
+        pickable=False,
+        filled=True,
+        stroked=False,
+        extruded=False,
+        get_polygon="polygon",
+        get_fill_color=[92, 107, 115, 200],
+    )
+
+
+def _segment_quad(lon1: float, lat1: float, lon2: float, lat2: float, half_width_m: float) -> list[list[float]]:
+    lon_scale = _EARTH_M_PER_DEG * math.cos(math.radians(lat1))
+    dx = (lon2 - lon1) * lon_scale
+    dy = (lat2 - lat1) * _EARTH_M_PER_DEG
+    length = math.hypot(dx, dy) or 1.0
+    off_lon = (-dy / length) * half_width_m / lon_scale
+    off_lat = (dx / length) * half_width_m / _EARTH_M_PER_DEG
+    return [
+        [lon1 + off_lon, lat1 + off_lat],
+        [lon2 + off_lon, lat2 + off_lat],
+        [lon2 - off_lon, lat2 - off_lat],
+        [lon1 - off_lon, lat1 - off_lat],
+        [lon1 + off_lon, lat1 + off_lat],
+    ]
 
 
 def _circle(longitude: float, latitude: float, radius_m: float, steps: int = 20) -> list[list[float]]:

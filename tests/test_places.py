@@ -1,19 +1,25 @@
+import io
+
 import numpy as np
 import pandas as pd
 
 from huskyquiet.analysis import (
-    ISSUANCE_NOT_NOISE,
-    comparison_text,
+    EXPECTED_HELP,
+    PROBABILITY_COLUMN,
+    apply_filters,
+    difference_points,
     explanatory_rows,
+    format_probability,
     nearby_summary,
+    permit_rows,
+    permits_csv,
     probability_color,
-    resolve_pin,
     summarize_permits,
 )
-from huskyquiet.areas import area_by_name, load_areas, permits_in_area
+from huskyquiet.areas import area_by_label, area_by_name, load_areas, permits_in_area
 from huskyquiet.geo import geometry_bounds, haversine_m, in_seattle, point_in_geometry, with_distance
-from huskyquiet.mapdeck import mappable_permits
-from huskyquiet.reporting import evaluation_headline
+from huskyquiet.mapdeck import area_deck, location_deck, mappable_permits
+from huskyquiet.reporting import evaluation_headline, model_timeline
 
 
 def _permits():
@@ -88,10 +94,65 @@ def test_expected_issuances_are_the_sum_of_probabilities():
     assert summary.n_permits == 3
     assert summary.expected_issuances_90d == 1.6
     assert summary.top[0]["permit_num"] == "3-CN"
-    text = comparison_text(summary, summarize_permits(frame.iloc[0:0], "Empty", "within 500 m"))
-    assert "1.6" in text and "0.0" in text
-    assert "do not measure construction starts" in text
-    assert text.endswith(ISSUANCE_NOT_NOISE)
+    assert summary.n_likely == 2
+    assert EXPECTED_HELP == (
+        "Adds the issuance probabilities of nearby applications. "
+        "This counts permits, not unique construction projects."
+    )
+
+
+def test_differences_are_factual_and_never_rank_places():
+    frame = with_distance(_permits(), 47.6560, -122.3095, 500)
+    busy = summarize_permits(frame, "A", "within 500 m")
+    empty = summarize_permits(frame.iloc[0:0], "B", "within 500 m")
+    points = difference_points(busy, empty, "Location A", "Location B")
+    text = " ".join(points)
+    assert "Location A has 2 more pending permits within 500 m (2 compared with 0)." in text
+    assert "0.7 near Location A and 0.0 near Location B" in text
+    assert "Location B has none within 500 m" in text
+    for word in ("quiet", "safer", "better", "worse", "risk"):
+        assert word not in text.lower()
+
+
+def test_identical_locations_get_one_plain_statement():
+    frame = with_distance(_permits(), 47.6560, -122.3095, 500)
+    summary = summarize_permits(frame, "A", "within 500 m")
+    points = difference_points(summary, summary, identical=True)
+    assert len(points) == 1
+    assert points[0].startswith("Both entries resolve to the same point")
+    assert "2 pending permits within 500 m" in points[0]
+
+
+def test_filters_drive_every_figure_and_the_csv():
+    frame = with_distance(_permits(), 47.6560, -122.3095, 500)
+    filtered = apply_filters(frame, ["Multifamily"], 0.0)
+    summary = summarize_permits(filtered, "A", "within 500 m")
+    assert filtered["permit_num"].tolist() == ["1-CN"]
+    assert summary.n_permits == 1 and abs(summary.expected_issuances_90d - 0.2) < 1e-9
+    exported = pd.read_csv(io.BytesIO(permits_csv(filtered)))
+    assert exported["Permit number"].tolist() == ["1-CN"]
+    assert exported[PROBABILITY_COLUMN].tolist() == [20.0]
+    assert list(exported.columns[:3]) == ["Permit number", "Address", "Permit type"]
+    assert "Distance (m)" in exported.columns
+    assert apply_filters(frame, None, 0.3)["permit_num"].tolist() == ["2-CN"]
+
+
+def test_empty_filter_result_is_handled():
+    frame = with_distance(_permits(), 47.6560, -122.3095, 500)
+    none_left = apply_filters(frame, [], 0.0)
+    summary = summarize_permits(none_left, "A", "within 500 m")
+    assert none_left.empty
+    assert (summary.n_permits, summary.expected_issuances_90d, summary.nearest_m) == (0, 0.0, None)
+    assert permits_csv(none_left).decode("utf-8").startswith("Permit number,Address")
+    assert location_deck(none_left, 47.6560, -122.3095, 500).layers
+
+
+def test_permit_rows_use_readable_values():
+    rows = permit_rows(_permits())
+    assert rows.loc[3, "Address"] == "Address not recorded"
+    assert rows.loc[0, "Estimated cost (USD)"] == 1_000_000
+    assert "Distance (m)" not in rows.columns
+    assert format_probability(0.756) == "76%"
 
 
 def test_nearby_summary_matches_radius():
@@ -113,15 +174,21 @@ def test_explanatory_rows_name_fired_keywords():
     assert rows["Estimated project cost"] == "$1,000,000"
 
 
-def test_resolve_pin_accepts_coordinates_and_rejects_a_blank_address():
-    pin = resolve_pin("  ", 47.66, -122.31, True, geocoder=None)
-    assert pin.source == "coordinates" and pin.latitude == 47.66
-    try:
-        resolve_pin("   ", None, None, False, geocoder=None)
-    except ValueError as exc:
-        assert "address" in str(exc).lower()
-    else:
-        raise AssertionError("blank address should fail")
+def test_university_village_is_labeled_as_a_shopping_center_inside_ravenna():
+    village = area_by_name("University Village")
+    ravenna = area_by_name("Ravenna")
+    assert village.label == "University Village (shopping center)"
+    assert area_by_label(village.label) is village
+    assert "not a neighborhood" in village.scope_note
+    assert "unofficial" in ravenna.scope_note
+    ring = village.geometry["coordinates"][0]
+    assert all(point_in_geometry(lon, lat, ravenna.geometry) for lon, lat in ring)
+
+
+def test_area_map_outlines_the_extent():
+    district = area_by_name("University District")
+    deck = area_deck(_permits(), outline=district.geometry)
+    assert [layer.id for layer in deck.layers][0] == "extent"
 
 
 def test_marker_circle_stays_on_the_recorded_coordinate():
@@ -152,3 +219,18 @@ def test_headline_reads_the_saved_report():
     assert headline["model_key"] == "hgb_calibrated_platt"
     assert headline["roc_auc"] == metrics["test"]["hgb_calibrated_platt"]["roc_auc"]
     assert headline["baseline_roc_auc"] == metrics["test"]["historical_rate_baseline"]["roc_auc"]
+
+
+def test_model_timeline_states_each_date_range():
+    metrics = {"split": {"val_start": "2024-08-01", "test_start": "2025-08-01",
+                         "last_forecast": "2026-07-01", "horizon_days": 90}}
+    meta = {"data_as_of": "2026-10-10", "calibration": "isotonic"}
+    rows = [(p.model, p.role, p.start, p.end) for p in model_timeline(metrics, meta, "2008-01-01")]
+    assert rows == [
+        ("Evaluation copy", "Training", "Jan 2008", "May 2024"),
+        ("Evaluation copy", "Calibration", "Aug 2024", "May 2025"),
+        ("Evaluation copy", "Held-out test", "Aug 2025", "Jul 2026"),
+        ("Deployed model", "Training", "Jan 2008", "May 2025"),
+        ("Deployed model", "Calibration", "Aug 2025", "Jul 2026"),
+        ("Deployed model", "Scoring", "Oct 11, 2026", ""),
+    ]

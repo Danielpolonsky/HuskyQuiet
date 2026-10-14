@@ -1,16 +1,16 @@
-# HuskyQuiet
+# HuskyQuiet · Seattle pending-permit explorer
 
-Predictive analytics for University of Washington students and Seattle renters who want
-to know what construction-permit activity is pending near an apartment.
+See pending development permits near a Seattle address and their likelihood of being
+issued within 90 days. Live site: <https://huskyquiet.streamlit.app>.
 
-**Milestone 1 (this repository state):** a reproducible data pipeline over the official
+The repository holds a reproducible pipeline over the official
 [Seattle Building Permits](https://data.seattle.gov/Built-Environment/Building-Permits/76t5-zqzr)
 dataset (`76t5-zqzr`), a leakage-audited prediction problem, calibrated baseline and ML
-models, and a validated Python prediction interface. The dashboard/map is Milestone 2.
+models, a validated Python prediction interface, and the Streamlit app.
 
 > **What the model predicts.** The probability that the City *issues* a pending permit
-> within the next 90 days. Permit issuance is not construction start and is not noise.
-> HuskyQuiet never presents these probabilities as noise predictions.
+> within the next 90 days. Issuance is the City's approval of the application. It is not
+> a construction start date, and HuskyQuiet does not predict noise.
 
 ## Quick start (Windows PowerShell)
 
@@ -23,8 +23,8 @@ pip install -r requirements.txt   # exact pinned versions
 pip install -e . --no-deps        # installs the `huskyquiet` package from src/
 
 python -m huskyquiet all          # download -> clean -> audit -> snapshots -> train (~20 min)
-python -m pytest                  # 66 tests (integration tests use the built artifacts)
-python -m pytest -m "not integration"   # 61 tests, no model files required
+python -m pytest                  # 112 tests (integration tests use the built artifacts)
+python -m pytest -m "not integration"   # 101 tests, no model files required
 ```
 
 Individual stages:
@@ -50,13 +50,11 @@ python -m streamlit run streamlit_app.py
 Open the URL Streamlit prints (usually http://localhost:8501). The app scores the permits
 already on disk. It does not retrain or redownload. Pages:
 
-* **Explore map** — pending applications at their recorded coordinates, colored by predicted issuance probability, with University District, University Village, Roosevelt, Wallingford, and Ravenna filters.
-* **Analyze address** — geocode a Seattle address (or type coordinates) and summarize permits within 250 m, 500 m, or 1 km.
-* **Compare apartments** — the same summary for two addresses, with a paragraph computed from the counts.
-* **Model performance** — ROC-AUC, PR-AUC, Brier, calibration, backtest, and feature importance read from `reports/metrics.json`.
-* **About** — what the number means, how to refresh the data, and where the area boundaries come from.
+* **Explore** — start from an address (250 m, 500 m, or 1 km) or browse an area (University District, Wallingford, Ravenna, Roosevelt, the University Village shopping center, or all of Seattle). Results show the pending permits, a map, a short table, and a CSV of exactly the rows shown. Filters apply to every figure on the page.
+* **Compare locations** — two addresses at the same radius, or two areas, side by side, with a list of factual differences.
+* **How it works** — what the numbers mean, which model was evaluated on which dates, held-out test results, and limitations.
 
-"Expected issuances" is the sum of predicted issuance probabilities. It is not a noise forecast and not a count of construction starts. Refresh and deployment are documented in [`docs/deployment.md`](docs/deployment.md).
+"Expected permits issued within 90 days" is the sum of the issuance probabilities of nearby applications. It counts permits, not unique construction projects. Address lookup only runs when you choose **Search** or **Compare**. Refresh, deployment, and geocoder settings are in [`docs/deployment.md`](docs/deployment.md).
 
 ## Using the model
 
@@ -125,9 +123,12 @@ within 90 days). The data extract is as of 2026-10-10:
 |---|---|---|---|---|
 | Historical-rate baseline (type × class × age) | 0.686 | 0.437 | 0.1909 | 0.042 |
 | Logistic regression + isotonic | 0.712 | 0.475 | 0.1863 | 0.025 |
-| HistGradientBoosting + Platt (production) | 0.765 | 0.562 | 0.1720 | 0.011 |
+| HistGradientBoosting + Platt (evaluation copy) | 0.765 | 0.562 | 0.1720 | 0.011 |
 
-The bootstrap 95% CI for HGB's ROC-AUC gain over the baseline is [0.072, 0.087]. Details,
+The evaluation copy was trained on forecast dates Jan 2008 to May 2024 and calibrated on
+Aug 2024 to May 2025. The deployed model repeats the recipe one year later (trained through
+May 2025, isotonic calibration on the test year), so the test year is not unseen for it and
+these numbers estimate, rather than measure, its performance. The bootstrap 95% CI for HGB's ROC-AUC gain over the baseline is [0.072, 0.087]. Details,
 slices, ablations, the rolling backtest, and caveats are in
 [`docs/modeling_methodology.md`](docs/modeling_methodology.md#5-results-from-the-current-run).
 Full machine-readable results are in `reports/metrics.json`, with a readable summary in `reports/model_report.md`.

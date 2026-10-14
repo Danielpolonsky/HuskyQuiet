@@ -29,6 +29,22 @@ class Area:
     geometry: dict
 
     @property
+    def label(self) -> str:
+        return f"{self.name} (shopping center)" if self.kind == "place" else self.name
+
+    @property
+    def scope_note(self) -> str:
+        if self.kind == "place":
+            return (
+                "University Village is the shopping center's footprint from OpenStreetMap, not a neighborhood. "
+                "It sits inside the Ravenna extent, so its permits are also counted in Ravenna."
+            )
+        return (
+            f"{self.name} uses the City Clerk's Neighborhood Map Atlas extent, "
+            "an unofficial indexing boundary rather than a legal neighborhood line."
+        )
+
+    @property
     def bounds(self) -> tuple[float, float, float, float]:
         return geometry_bounds(self.geometry)
 
@@ -61,10 +77,17 @@ def area_by_name(name: str) -> Area:
     raise KeyError(f"unknown area {name!r}; expected one of {known}")
 
 
+def area_by_label(label: str) -> Area:
+    for area in load_areas():
+        if area.label == label:
+            return area
+    return area_by_name(label)
+
+
 def area_scope(area: Area) -> str:
     if area.kind == "place":
-        return "OpenStreetMap footprint"
-    return "City Clerk extent"
+        return "inside the shopping-center footprint"
+    return f"inside the {area.name} extent"
 
 
 def permits_in_area(frame: pd.DataFrame, area: Area) -> pd.DataFrame:

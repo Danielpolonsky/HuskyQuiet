@@ -1,22 +1,28 @@
-"""Deterministic summaries of scored permits around a home or inside an area.
+"""Deterministic summaries of scored permits around a location or inside an area.
 
-Every sentence in ``comparison_text`` is computed from the summary objects. There is no
-language model and no claim about noise, construction starts, or disturbance.
+Every sentence in ``difference_points`` is computed from two summaries. There is no
+language model, and no sentence ranks homes or claims anything about noise,
+construction starts, or disturbance.
 """
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from dataclasses import dataclass
 
 import pandas as pd
 
-from huskyquiet.geo import in_seattle, with_distance
+from huskyquiet.geo import with_distance
 
-ISSUANCE_NOT_NOISE = (
-    "These figures are forecasts of permit issuance, a regulatory milestone. "
-    "They are a proxy for nearby development activity in the City's permit record. "
-    "They do not measure construction starts, noise, or the chance a residence will be disturbed."
+ISSUANCE_NOTE = (
+    "Issuance is the City's approval of a permit application. "
+    "It is not a construction start date, and HuskyQuiet does not predict noise."
 )
+EXPECTED_HELP = (
+    "Adds the issuance probabilities of nearby applications. "
+    "This counts permits, not unique construction projects."
+)
+LIKELY_THRESHOLD = 0.5
 
 # Sequential teal. Darker means a higher predicted issuance probability, not more danger.
 PROBABILITY_RAMP: tuple[tuple[float, tuple[int, int, int]], ...] = (
@@ -47,6 +53,8 @@ KEYWORD_LABELS: dict[str, str] = {
     "kw_addition": "Addition",
 }
 
+PROBABILITY_COLUMN = "Chance issued within 90 days (%)"
+
 
 def probability_color(probability: float) -> list[int]:
     """RGBA color for a predicted issuance probability in ``[0, 1]``."""
@@ -71,7 +79,15 @@ def format_cost(value) -> str:
 
 
 def format_probability(value: float) -> str:
-    return f"{float(value):.1%}"
+    return f"{float(value):.0%}"
+
+
+def format_distance(distance_m: float | None) -> str:
+    if distance_m is None:
+        return "—"
+    if distance_m < 1000:
+        return f"{distance_m:,.0f} m"
+    return f"{distance_m / 1000:.2f} km"
 
 
 @dataclass(frozen=True)
@@ -84,9 +100,24 @@ class LocationSummary:
     expected_issuances_90d: float
     nearest_m: float | None
     median_probability: float | None
+    n_likely: int
     by_description: dict[str, int]
     by_class: dict[str, int]
     top: tuple[dict, ...]
+
+
+def apply_filters(
+    frame: pd.DataFrame,
+    classes: Sequence[str] | None = None,
+    min_probability: float = 0.0,
+) -> pd.DataFrame:
+    """Keep permits in ``classes`` (all when ``None``) at or above ``min_probability``."""
+    out = frame
+    if classes is not None:
+        out = out.loc[out["permit_class"].isin(list(classes))]
+    if min_probability > 0:
+        out = out.loc[pd.to_numeric(out["probability_issued_90d"], errors="coerce") >= min_probability]
+    return out
 
 
 def summarize_permits(
@@ -98,18 +129,16 @@ def summarize_permits(
 ) -> LocationSummary:
     """Summarize a set of already-scored permits.
 
-    ``expected_issuances_90d`` is the sum of predicted issuance probabilities. It is an
-    expected count of issuances, not a count of projects that will start construction.
+    ``expected_issuances_90d`` is the sum of predicted issuance probabilities: an
+    expected count of permits issued, not a count of projects that start work.
     """
     work = frame
     if work.empty:
-        return LocationSummary(label, scope, 0, 0.0, None, None, {}, {}, ())
+        return LocationSummary(label, scope, 0, 0.0, None, None, 0, {}, {}, ())
     probabilities = pd.to_numeric(work["probability_issued_90d"], errors="coerce").fillna(0.0)
     nearest = None
     if distance_col and distance_col in work.columns and work[distance_col].notna().any():
         nearest = float(work[distance_col].min())
-    by_description = _counts(work, "permit_type_desc")
-    by_class = _counts(work, "permit_class")
     ranked = work.assign(_p=probabilities).sort_values(["_p", "permit_num"], ascending=[False, True])
     top_rows = []
     for row in ranked.head(top_n).to_dict(orient="records"):
@@ -131,38 +160,11 @@ def summarize_permits(
         expected_issuances_90d=float(probabilities.sum()),
         nearest_m=nearest,
         median_probability=float(probabilities.median()),
-        by_description=by_description,
-        by_class=by_class,
+        n_likely=int((probabilities >= LIKELY_THRESHOLD).sum()),
+        by_description=_counts(work, "permit_type_desc"),
+        by_class=_counts(work, "permit_class"),
         top=tuple(top_rows),
     )
-
-
-@dataclass(frozen=True)
-class Pin:
-    label: str
-    latitude: float
-    longitude: float
-    source: str
-
-
-def resolve_pin(address: str, latitude: float | None, longitude: float | None, manual: bool, geocoder) -> Pin:
-    """Resolve a form submission to a Seattle point, or raise ``ValueError`` / ``GeocodeError``."""
-    from huskyquiet.geocode import GeocodeError
-
-    text = " ".join((address or "").split())
-    if manual:
-        if latitude is None or longitude is None:
-            raise ValueError("Enter both latitude and longitude.")
-        if not in_seattle(latitude, longitude):
-            raise ValueError("Those coordinates are outside the Seattle bounding box used by HuskyQuiet.")
-        return Pin(text or f"{latitude:.5f}, {longitude:.5f}", float(latitude), float(longitude), "coordinates")
-    if not text:
-        raise ValueError("Enter a Seattle address, or choose coordinates instead.")
-    try:
-        hit = geocoder.geocode(text)
-    except GeocodeError:
-        raise
-    return Pin(hit.display_name, hit.latitude, hit.longitude, hit.source)
 
 
 def nearby_summary(
@@ -173,40 +175,38 @@ def nearby_summary(
     label: str,
 ) -> LocationSummary:
     nearby = with_distance(permits, latitude, longitude, radius_m)
-    scope = f"within {int(radius_m)} m"
-    return summarize_permits(nearby, label, scope)
+    return summarize_permits(nearby, label, f"within {format_distance(radius_m)}")
 
 
-def comparison_text(left: LocationSummary, right: LocationSummary) -> str:
-    """Plain-language comparison using only counts computed from the two summaries."""
-    sentences = [
-        (
-            f"{_quote(left.label)} ({left.scope}) has {left.n_permits} pending "
-            f"{_permit_word(left.n_permits)} with usable coordinates. "
-            f"{_quote(right.label)} ({right.scope}) has {right.n_permits}."
+def difference_points(
+    left: LocationSummary,
+    right: LocationSummary,
+    left_name: str = "the first location",
+    right_name: str = "the second location",
+    identical: bool = False,
+) -> list[str]:
+    """Plain-language facts that differ between two summaries. Computed, never generated."""
+    if identical:
+        return [
+            "Both entries resolve to the same point, so every figure below is the same: "
+            f"{left.n_permits} pending {_permits(left.n_permits)} {left.scope} and "
+            f"{left.expected_issuances_90d:.1f} expected to be issued within 90 days."
+        ]
+    points = [_count_point(left, right, left_name, right_name)]
+    points.append(_expected_point(left, right, left_name, right_name))
+    nearest = _nearest_point(left, right, left_name, right_name)
+    if nearest:
+        points.append(nearest)
+    if left.n_permits and right.n_permits:
+        points.append(
+            f"{left.n_likely} of {left.n_permits} near {left_name} and {right.n_likely} of {right.n_permits} "
+            f"near {right_name} have at least a {LIKELY_THRESHOLD:.0%} predicted chance of issuance."
         )
-    ]
-    sentences.append(
-        "The expected number of those permits issued in the next 90 days is "
-        f"{left.expected_issuances_90d:.1f} near the first place and "
-        f"{right.expected_issuances_90d:.1f} near the second. "
-        "Each figure is the sum of the individual predicted issuance probabilities."
-    )
-    if left.nearest_m is not None and right.nearest_m is not None:
-        sentences.append(
-            f"The nearest pending application is {_meters(left.nearest_m)} from the first place "
-            f"and {_meters(right.nearest_m)} from the second."
-        )
-    elif left.median_probability is not None and right.median_probability is not None:
-        sentences.append(
-            "The median predicted issuance probability is "
-            f"{format_probability(left.median_probability)} in the first set and "
-            f"{format_probability(right.median_probability)} in the second."
-        )
-    sentences.append(_mix_sentence("first", left))
-    sentences.append(_mix_sentence("second", right))
-    sentences.append(ISSUANCE_NOT_NOISE)
-    return " ".join(part for part in sentences if part)
+    for name, summary in ((left_name, left), (right_name, right)):
+        mix = _mix_point(name, summary)
+        if mix:
+            points.append(mix)
+    return points
 
 
 def explanatory_rows(row: pd.Series) -> list[tuple[str, str]]:
@@ -243,6 +243,84 @@ def explanatory_rows(row: pd.Series) -> list[tuple[str, str]]:
     return rows
 
 
+def permit_rows(frame: pd.DataFrame) -> pd.DataFrame:
+    """The permits in ``frame`` with readable column names, in the order given."""
+    out = pd.DataFrame({
+        "Permit number": _column(frame, "permit_num"),
+        "Address": _column(frame, "address_key").fillna("Address not recorded"),
+        "Permit type": _column(frame, "permit_type_mapped"),
+        "Class": _column(frame, "permit_class"),
+        "Category": _column(frame, "permit_type_desc").fillna("Not recorded"),
+        "Description": _column(frame, "description"),
+        "Applied": pd.to_datetime(_column(frame, "applied_date"), errors="coerce").dt.date,
+        "Age (days)": pd.to_numeric(_column(frame, "age_days"), errors="coerce"),
+        "Estimated cost (USD)": pd.to_numeric(_column(frame, "est_project_cost"), errors="coerce"),
+    })
+    if "distance_m" in frame.columns:
+        out["Distance (m)"] = pd.to_numeric(frame["distance_m"], errors="coerce").round(0).to_numpy()
+    probability = pd.to_numeric(_column(frame, "probability_issued_90d"), errors="coerce")
+    out[PROBABILITY_COLUMN] = (probability * 100).round(1).to_numpy()
+    out["Latitude"] = pd.to_numeric(_column(frame, "latitude"), errors="coerce").to_numpy()
+    out["Longitude"] = pd.to_numeric(_column(frame, "longitude"), errors="coerce").to_numpy()
+    return out
+
+
+def permits_csv(frame: pd.DataFrame) -> bytes:
+    return permit_rows(frame).to_csv(index=False, lineterminator="\n").encode("utf-8")
+
+
+def _column(frame: pd.DataFrame, name: str) -> pd.Series:
+    if name in frame.columns:
+        return frame[name].reset_index(drop=True)
+    return pd.Series([None] * len(frame), dtype="object")
+
+
+def _count_point(left: LocationSummary, right: LocationSummary, left_name: str, right_name: str) -> str:
+    if left.n_permits == right.n_permits:
+        return f"Both have {left.n_permits} pending {_permits(left.n_permits)} {left.scope}."
+    more, less, more_name = (left, right, left_name) if left.n_permits > right.n_permits else (right, left, right_name)
+    gap = more.n_permits - less.n_permits
+    return (
+        f"{_capital(more_name)} has {gap} more pending {_permits(gap)} {more.scope} "
+        f"({more.n_permits} compared with {less.n_permits})."
+    )
+
+
+def _expected_point(left: LocationSummary, right: LocationSummary, left_name: str, right_name: str) -> str:
+    a, b = round(left.expected_issuances_90d, 1), round(right.expected_issuances_90d, 1)
+    if a == b:
+        return f"Both are expected to see about {a:.1f} of those permits issued within 90 days."
+    return (
+        f"Expected permits issued within 90 days: {a:.1f} near {left_name} "
+        f"and {b:.1f} near {right_name}."
+    )
+
+
+def _mix_point(name: str, summary: LocationSummary) -> str:
+    if summary.n_permits == 0 or not summary.by_description:
+        return ""
+    kind, count = max(summary.by_description.items(), key=lambda item: (item[1], item[0]))
+    return f"The most common category near {name} is {kind} ({count} of {summary.n_permits})."
+
+
+def _nearest_point(left: LocationSummary, right: LocationSummary, left_name: str, right_name: str) -> str:
+    if left.nearest_m is not None and right.nearest_m is not None:
+        return (
+            f"The nearest pending permit is {format_distance(left.nearest_m)} from {left_name} "
+            f"and {format_distance(right.nearest_m)} from {right_name}."
+        )
+    for name, summary, other_name, other in (
+        (left_name, left, right_name, right),
+        (right_name, right, left_name, left),
+    ):
+        if summary.nearest_m is not None:
+            return (
+                f"The nearest pending permit to {name} is {format_distance(summary.nearest_m)} away. "
+                f"{_capital(other_name)} has none {other.scope}."
+            )
+    return ""
+
+
 def _counts(frame: pd.DataFrame, column: str) -> dict[str, int]:
     if column not in frame.columns:
         return {}
@@ -250,28 +328,12 @@ def _counts(frame: pd.DataFrame, column: str) -> dict[str, int]:
     return {str(k): int(v) for k, v in series.value_counts().items()}
 
 
-def _mix_sentence(which: str, summary: LocationSummary) -> str:
-    if summary.n_permits == 0 or not summary.by_description:
-        return ""
-    kind, count = max(summary.by_description.items(), key=lambda item: item[1])
-    return (
-        f"In the {which} set the most common description category is {kind} "
-        f"({count} of {summary.n_permits})."
-    )
+def _permits(n: int) -> str:
+    return "permit" if n == 1 else "permits"
 
 
-def _permit_word(n: int) -> str:
-    return "application" if n == 1 else "applications"
-
-
-def _quote(text: str) -> str:
-    return text if len(text) < 80 else text[:77] + "..."
-
-
-def _meters(distance_m: float) -> str:
-    if distance_m < 1000:
-        return f"{distance_m:.0f} m"
-    return f"{distance_m / 1000:.2f} km"
+def _capital(text: str) -> str:
+    return text[:1].upper() + text[1:]
 
 
 def _missing(value) -> bool:
