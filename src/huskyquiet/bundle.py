@@ -10,6 +10,7 @@ replaced, so a validated production model is left alone.
 from __future__ import annotations
 
 import hashlib
+import json
 import os
 import zipfile
 from pathlib import Path
@@ -17,6 +18,9 @@ from pathlib import Path
 import requests
 
 from huskyquiet.config import Paths, get_paths
+
+_BUNDLE_SOURCE = Path("deployment") / "bundle_source.json"
+_USER_AGENT = "HuskyQuiet/0.2 (public runtime bundle)"
 
 SLIM_COLUMNS = (
     "permit_num",
@@ -89,33 +93,73 @@ def write_runtime_bundle(paths: Paths | None = None, dest: Path | None = None) -
     return dest
 
 
+def _secrets_bundle() -> tuple[str, str]:
+    """Read Cloud or local Streamlit secrets. Missing secrets are not an error."""
+    try:
+        import streamlit as st
+
+        url = str(st.secrets.get("HUSKYQUIET_BUNDLE_URL", "")).strip()
+        digest = str(st.secrets.get("HUSKYQUIET_BUNDLE_SHA256", "")).strip().lower()
+    except Exception:
+        return "", ""
+    return url, digest
+
+
+def _file_bundle(path: Path) -> tuple[str, str]:
+    if not path.is_file():
+        return "", ""
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    url = str(payload.get("url", "")).strip()
+    digest = str(payload.get("sha256", "")).strip().lower()
+    return url, digest
+
+
+def configured_bundle(paths: Paths) -> tuple[str, str]:
+    """URL and optional SHA-256. Environment and Streamlit secrets override the repo file."""
+    env_url = os.environ.get("HUSKYQUIET_BUNDLE_URL", "").strip()
+    if env_url:
+        return env_url, os.environ.get("HUSKYQUIET_BUNDLE_SHA256", "").strip().lower()
+    secret_url, secret_sha = _secrets_bundle()
+    if secret_url:
+        return secret_url, secret_sha
+    return _file_bundle(paths.root / _BUNDLE_SOURCE)
+
+
 def ensure_runtime(paths: Paths | None = None) -> None:
     """No-op when the production model and cleaned permits are already on disk."""
     paths = paths or get_paths()
     model = paths.model_dir / "production" / "model.joblib"
     if model.exists() and paths.clean_permits.exists():
         return
-    url = os.environ.get("HUSKYQUIET_BUNDLE_URL", "").strip()
+    url, expected = configured_bundle(paths)
     if not url:
         raise FileNotFoundError(
             "The production model or cleaned permits are not on disk. "
             "Run `python -m huskyquiet all`, or set HUSKYQUIET_BUNDLE_URL to a runtime zip "
             "from `python -m huskyquiet bundle`."
         )
+    if not url.startswith("https://"):
+        raise RuntimeError("Runtime bundle URL must be HTTPS.")
     cache = paths.data / "cache"
     cache.mkdir(parents=True, exist_ok=True)
     zip_path = cache / "runtime_bundle.zip"
     try:
-        response = requests.get(url, timeout=180)
+        response = requests.get(
+            url,
+            timeout=180,
+            headers={"User-Agent": _USER_AGENT},
+            allow_redirects=True,
+        )
         response.raise_for_status()
     except requests.RequestException as exc:
         raise RuntimeError(f"Could not download the runtime bundle ({exc.__class__.__name__}).") from exc
-    zip_path.write_bytes(response.content)
-    expected = os.environ.get("HUSKYQUIET_BUNDLE_SHA256", "").strip().lower()
     actual = hashlib.sha256(response.content).hexdigest()
     if expected and actual != expected:
         zip_path.unlink(missing_ok=True)
         raise RuntimeError("Downloaded bundle SHA-256 does not match HUSKYQUIET_BUNDLE_SHA256.")
+    if not response.content.startswith(b"PK"):
+        raise RuntimeError("Downloaded runtime bundle is not a zip file.")
+    zip_path.write_bytes(response.content)
     _extract_missing(zip_path, paths.root)
 
 

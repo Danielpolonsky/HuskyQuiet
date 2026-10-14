@@ -1,6 +1,15 @@
 """HuskyQuiet web application. Run with ``python -m streamlit run streamlit_app.py``."""
 
+import sys
+from pathlib import Path
+
 import streamlit as st
+
+# Community Cloud installs requirements.txt but not the src layout. Importing from
+# this checkout keeps Paths() rooted at the repository, not site-packages.
+_SRC = Path(__file__).resolve().parent / "src"
+if _SRC.is_dir() and str(_SRC) not in sys.path:
+    sys.path.insert(0, str(_SRC))
 
 st.set_page_config(
     page_title="HuskyQuiet",

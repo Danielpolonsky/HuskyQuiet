@@ -33,6 +33,21 @@ def test_missing_runtime_without_a_url_is_explicit(tmp_path, monkeypatch):
         ensure_runtime(Paths(root=tmp_path))
 
 
+def test_file_source_must_be_https(tmp_path, monkeypatch):
+    monkeypatch.delenv("HUSKYQUIET_BUNDLE_URL", raising=False)
+    monkeypatch.delenv("HUSKYQUIET_BUNDLE_SHA256", raising=False)
+    monkeypatch.setattr("huskyquiet.bundle._secrets_bundle", lambda: ("", ""))
+    root = tmp_path / "app"
+    source = root / "deployment"
+    source.mkdir(parents=True)
+    (source / "bundle_source.json").write_text(
+        '{"url": "http://example.invalid/bundle.zip", "sha256": ""}',
+        encoding="utf-8",
+    )
+    with pytest.raises(RuntimeError, match="HTTPS"):
+        ensure_runtime(Paths(root=root))
+
+
 def test_download_checks_sha256(tmp_path, monkeypatch):
     class Response:
         content = b"not-a-real-bundle"
