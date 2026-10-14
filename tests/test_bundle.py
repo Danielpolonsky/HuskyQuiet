@@ -1,10 +1,20 @@
 import hashlib
+import json
 import zipfile
+from pathlib import Path
 
 import pytest
 
 from huskyquiet.bundle import _extract_missing, ensure_runtime
 from huskyquiet.config import Paths
+
+
+def test_committed_bundle_source_is_a_public_https_release():
+    root = Path(__file__).resolve().parents[1]
+    payload = json.loads((root / "deployment" / "bundle_source.json").read_text(encoding="utf-8"))
+    assert payload["url"].startswith("https://github.com/Danielpolonsky/HuskyQuiet/releases/download/")
+    assert len(payload["sha256"]) == 64
+    int(payload["sha256"], 16)
 
 
 def test_extract_rejects_path_traversal(tmp_path):
