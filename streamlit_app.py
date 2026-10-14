@@ -11,6 +11,26 @@ _SRC = Path(__file__).resolve().parent / "src"
 if _SRC.is_dir() and str(_SRC) not in sys.path:
     sys.path.insert(0, str(_SRC))
 
+
+def _load_current_package() -> None:
+    """Re-import ``huskyquiet`` if its files changed since this process imported it.
+
+    Community Cloud pulls a push into the running process without restarting it, so
+    page scripts would otherwise run against the previous version's modules.
+    """
+    loaded = sys.modules.get("huskyquiet")
+    if loaded is None:
+        return
+    newest = max((p.stat().st_mtime_ns for p in (_SRC / "huskyquiet").rglob("*.py")), default=0)
+    if newest > getattr(loaded, "IMPORTED_AT_NS", 0):
+        for name in [m for m in sys.modules if m == "huskyquiet" or m.startswith("huskyquiet.")]:
+            del sys.modules[name]
+        st.cache_data.clear()
+        st.cache_resource.clear()
+
+
+_load_current_package()
+
 st.set_page_config(
     page_title="HuskyQuiet",
     page_icon=":material/map:",

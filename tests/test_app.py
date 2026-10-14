@@ -1,3 +1,5 @@
+import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -131,3 +133,23 @@ def test_how_it_works_labels_the_evaluated_model_and_period(app):
     assert "| Deployed model | Calibration | Aug 2025 to Jul 2026 |" in text
     assert "ROC-AUC is not accuracy" in text
     assert "evaluation copy" in text
+
+
+_STALE_PROCESS = """
+import sys
+sys.path.insert(0, {src!r})
+import huskyquiet, huskyquiet.analysis
+del huskyquiet.IMPORTED_AT_NS, huskyquiet.analysis.ISSUANCE_NOTE
+from streamlit.testing.v1 import AppTest
+at = AppTest.from_file({app!r}, default_timeout=180).run()
+assert not at.exception, at.exception
+assert hasattr(sys.modules["huskyquiet.analysis"], "ISSUANCE_NOTE")
+"""
+
+
+def test_app_reloads_a_package_left_over_from_the_previous_deploy():
+    if not MODEL.exists() or not CLEAN.exists():
+        pytest.skip("production artifacts not built")
+    script = _STALE_PROCESS.format(src=str(ROOT / "src"), app=str(ROOT / "streamlit_app.py"))
+    result = subprocess.run([sys.executable, "-c", script], cwd=ROOT, capture_output=True, text=True, timeout=300)
+    assert result.returncode == 0, result.stderr[-2000:]
